@@ -165,8 +165,10 @@ jobs:
       - name: Update deployment image
         run: |
           # Update the image in deployment (container name is 'app')
+          # Use short SHA (7 chars) to match docker/metadata-action output
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           kubectl set image deployment/chess-tournament-app \
-            app=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            app=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA} \
             -n chess-tournament
 
       - name: Wait for rollout
