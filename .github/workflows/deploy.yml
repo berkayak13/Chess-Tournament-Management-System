@@ -62,6 +62,7 @@ jobs:
 
       - name: Initialize database
         run: |
+          mysql -h 127.0.0.1 -u root -p1234 chessdb < code/schema.sql
           mysql -h 127.0.0.1 -u root -p1234 chessdb < code/triggers.sql
         env:
           MYSQL_PWD: 1234
