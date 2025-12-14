@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+.eggs/
+*.egg-info/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+pytest.ini
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.docker/
+
+# Misc
+*.md
+*.log
+.env*
+.DS_Store
+
+# Terraform and K8s (not needed in container)
+infra/
+k8s/
+locust/
+worker/
+cloud-function*/

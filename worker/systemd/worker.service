@@ -1,0 +1,29 @@
+[Unit]
+Description=Chess Tournament Stats Worker
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/chess-worker
+ExecStart=/opt/chess-worker/venv/bin/python worker.py
+Restart=always
+RestartSec=10
+
+# Environment variables
+Environment=PYTHONUNBUFFERED=1
+Environment=COMPUTE_INTERVAL=300
+
+# These will be overridden by startup script
+Environment=DB_HOST=127.0.0.1
+Environment=DB_PORT=3306
+Environment=DB_USER=chess_app
+Environment=DB_NAME=chessdb
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=chess-worker
+
+[Install]
+WantedBy=multi-user.target

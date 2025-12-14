@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Terraform - SENSITIVE!
+infra/terraform-key.json
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfvars
+infra/tmp/
+
+# Kubernetes secrets
+k8s/*-secrets.yaml
+k8s/secrets.yaml
+
+# Local dev
+*.log
+.DS_Store
+/tmp/
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/

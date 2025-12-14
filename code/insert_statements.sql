@@ -148,13 +148,13 @@ INSERT INTO arbiters (
   ('mohamed', 'mpass',    'Mohamed', 'Farouk', 'Egypt',      'advanced');
 
 
-INSERT INTO Arbiter_certifications (username, certification) VALUES  ('erin',    'FIDE Certified'),  ('mark',    'National Arbiter'),  ('lucy',    'International Arbiter'),  ('ahmet',   'Local Certification'),  ('ana',     'FIDE Certified'),  ('james',   'Regional Certification'),  ('sara',    'International Arbiter'),  ('mohamed', 'National Arbiter');
+INSERT INTO arbiter_certifications (username, certification) VALUES  ('erin',    'FIDE Certified'),  ('mark',    'National Arbiter'),  ('lucy',    'International Arbiter'),  ('ahmet',   'Local Certification'),  ('ana',     'FIDE Certified'),  ('james',   'Regional Certification'),  ('sara',    'International Arbiter'),  ('mohamed', 'National Arbiter');
 
-INSERT INTO Halls (hall_ID, hall_name, hall_country, hall_capacity) VALUES  (1,  'Grandmaster Arena',   'USA',    10),  (2,  'Royal Chess Hall',    'UK',      8),  (3,  'FIDE Dome',           'Germany',12),  (4,  'Masters Pavilion',    'Turkey',  6),  (5,  'Checkmate Center',    'France',  9),  (6,  'ELO Stadium',         'Spain',  10),  (7,  'Tactical Grounds',    'Italy',   7),  (8,  'Endgame Hall',        'India',   8),  (9,  'Strategic Square',    'Canada',  6),  (10, 'Opening Hall',        'Japan',   5);
+INSERT INTO halls (hall_ID, hall_name, hall_country, hall_capacity) VALUES  (1,  'Grandmaster Arena',   'USA',    10),  (2,  'Royal Chess Hall',    'UK',      8),  (3,  'FIDE Dome',           'Germany',12),  (4,  'Masters Pavilion',    'Turkey',  6),  (5,  'Checkmate Center',    'France',  9),  (6,  'ELO Stadium',         'Spain',  10),  (7,  'Tactical Grounds',    'Italy',   7),  (8,  'Endgame Hall',        'India',   8),  (9,  'Strategic Square',    'Canada',  6),  (10, 'Opening Hall',        'Japan',   5);
 
-INSERT INTO Match_tables (table_id, hall_id) VALUES  (1,  1),  (2,  1),  (3,  1),  (4,  2),  (5,  2),  (6,  3),  (7,  3),  (8,  3),  (9,  4),  (10, 5),  (11, 6),  (12, 6),  (13, 7),  (14, 8),  (15, 9),  (16,10);
+INSERT INTO match_tables (table_id, hall_id) VALUES  (1,  1),  (2,  1),  (3,  1),  (4,  2),  (5,  2),  (6,  3),  (7,  3),  (8,  3),  (9,  4),  (10, 5),  (11, 6),  (12, 6),  (13, 7),  (14, 8),  (15, 9),  (16,10);
 
-INSERT INTO Matches (  match_id,  date,  time_slot,  hall_id,  table_id,  team1_id,  team2_id,  arbiter_username,  ratings) VALUES  (1,  '2025-02-01', '01:00:00',  1,  1,  1,  2, 'erin',   8.2),  (2,  '2025-02-01', '03:00:00',  1,  2,  3,  4, 'lucy',   7.9),  (3,  '2025-02-02', '01:00:00',  1,  3,  5,  6, 'mark',   NULL),  (4,  '2025-02-02', '03:00:00',  2,  4,  7,  8, 'erin',   8.5),  (5,  '2025-02-03', '01:00:00',  2,  5,  9, 10, 'lucy',   NULL),  (6,  '2025-02-03', '03:00:00',  3,  6,  1,  3, 'mohamed',NULL),  (7,  '2025-02-04', '01:00:00',  3,  7,  2,  5, 'erin',   4.5),  (8,  '2025-02-04', '03:00:00',  3,  8,  6,  7, 'sara',   3.1),  (9,  '2025-02-05', '01:00:00',  4,  9,  8,  9, 'ana',    7.7),  (10, '2025-02-05', '03:00:00',  5, 10, 10,  1, 'mark',   6.4),  (11, '2025-02-06', '01:00:00',  6, 11,  3,  5, 'james',  5.1),  (12, '2025-02-06', '03:00:00',  6, 12,  4,  6, 'lucy',   NULL),  (13, '2025-02-07', '01:00:00',  7, 13,  7,  9, 'sara',   NULL),  (14, '2025-02-07', '03:00:00',  8, 14,  8, 10, 'mohamed',2.6),  (15, '2025-02-08', '01:00:00',  9, 15,  1,  4, 'erin',   7.1),  (16, '2025-02-08', '03:00:00', 10, 16,  2,  5, 'ana',    6.3),  (17, '2025-02-09', '01:00:00', 10, 16,  3,  6, 'james',  NULL),  (18, '2025-02-09', '03:00:00',  8, 14,  7, 10, 'mark',   4.9),  (19, '2025-02-10', '01:00:00',  7, 13,  5,  8, 'lucy',   9.7),  (20, '2025-02-10', '03:00:00',  3,  8,  6,  9, 'ahmet',  7.4);
+INSERT INTO matches (  match_id,  date,  time_slot,  hall_id,  table_id,  team1_id,  team2_id,  arbiter_username,  ratings) VALUES  (1,  '2025-02-01', '01:00:00',  1,  1,  1,  2, 'erin',   8.2),  (2,  '2025-02-01', '03:00:00',  1,  2,  3,  4, 'lucy',   7.9),  (3,  '2025-02-02', '01:00:00',  1,  3,  5,  6, 'mark',   NULL),  (4,  '2025-02-02', '03:00:00',  2,  4,  7,  8, 'erin',   8.5),  (5,  '2025-02-03', '01:00:00',  2,  5,  9, 10, 'lucy',   NULL),  (6,  '2025-02-03', '03:00:00',  3,  6,  1,  3, 'mohamed',NULL),  (7,  '2025-02-04', '01:00:00',  3,  7,  2,  5, 'erin',   4.5),  (8,  '2025-02-04', '03:00:00',  3,  8,  6,  7, 'sara',   3.1),  (9,  '2025-02-05', '01:00:00',  4,  9,  8,  9, 'ana',    7.7),  (10, '2025-02-05', '03:00:00',  5, 10, 10,  1, 'mark',   6.4),  (11, '2025-02-06', '01:00:00',  6, 11,  3,  5, 'james',  5.1),  (12, '2025-02-06', '03:00:00',  6, 12,  4,  6, 'lucy',   NULL),  (13, '2025-02-07', '01:00:00',  7, 13,  7,  9, 'sara',   NULL),  (14, '2025-02-07', '03:00:00',  8, 14,  8, 10, 'mohamed',2.6),  (15, '2025-02-08', '01:00:00',  9, 15,  1,  4, 'erin',   7.1),  (16, '2025-02-08', '03:00:00', 10, 16,  2,  5, 'ana',    6.3),  (17, '2025-02-09', '01:00:00', 10, 16,  3,  6, 'james',  NULL),  (18, '2025-02-09', '03:00:00',  8, 14,  7, 10, 'mark',   4.9),  (19, '2025-02-10', '01:00:00',  7, 13,  5,  8, 'lucy',   9.7),  (20, '2025-02-10', '03:00:00',  3,  8,  6,  9, 'ahmet',  7.4);
 
 INSERT INTO players (
   username,
@@ -219,8 +219,6 @@ INSERT INTO players (
   ('lily',     'Lily@sun',    'Lily',     'Nakamura',  'USA',        '2003-02-12', 2310, 'FIDE049', 2, '');
 
 
-INSERT INTO match_assignments (match_id, white_player, black_player, result) VALUES  (1,  'alice',  'bob1',   'draw'),  (2,  'clara',  'david',  'black wins'),  (3,  'emma',   'felix',  'black wins'),  (4,  'grace',  'henry',  'draw'),  (5,  'isabel', 'jack',   'black wins'),  (6,  'kara',   'liam',   'white wins'),  (7,  'mia',    'noah',   'black wins'),  (8,  'olivia', 'peter',  'white wins'),  (9,  'quinn',  'rachel', 'black wins'),  (10, 'sam',    'tina',   'black wins'),  (11, 'tina',   'umar',   'white wins'),  (12, 'umar',   'vera',   'white wins'),  (13, 'vera',   'will',   'black wins'),  (14, 'will',   'xena',   'draw'),  (15, 'xena',   'yusuff', 'draw'),  (16, 'yusuff', 'zoe',    'white wins'),  (17, 'zoe',    'hakan',  'black wins'),  (18, 'hakan',  'julia',  'black wins'),  (19, 'julia',  'mehmet', 'black wins'),  (20, 'mehmet', 'elena',  'white wins');
-
 INSERT INTO player_teams (username, team_id) VALUES
   ('alice',    1),
   ('bob1',     2),
@@ -270,4 +268,28 @@ INSERT INTO player_teams (username, team_id) VALUES
   ('ella',     7),
   ('alex',     8),
   ('lily',     9);
+
+-- Match assignments aligned with teams:
+-- match_id -> (team1, team2): white must be in team1, black must be in team2
+INSERT INTO match_assignments (match_id, white_player, black_player, result) VALUES
+  (1,  'alice',    'bob1',     'draw'),        -- team1=1, team2=2
+  (2,  'clara',    'david',    'black wins'),  -- team1=3, team2=4
+  (3,  'emma',     'felix',    'black wins'),  -- team1=5, team2=6
+  (4,  'grace',    'henry',    'draw'),        -- team1=7, team2=8
+  (5,  'isabel',   'jack',     'black wins'),  -- team1=9, team2=10
+  (6,  'kara',     'mia',      'white wins'),  -- team1=1, team2=3
+  (7,  'liam',     'olivia',   'black wins'),  -- team1=2, team2=5
+  (8,  'peter',    'quinn',    'white wins'),  -- team1=6, team2=7
+  (9,  'rachel',   'sam',      'black wins'),  -- team1=8, team2=9
+  (10, 'tina',     'umar',     'black wins'),  -- team1=10, team2=1
+  (11, 'will',     'yusuff',   'white wins'),  -- team1=3, team2=5
+  (12, 'noah',     'zoe',      'white wins'),  -- team1=4, team2=6
+  (13, 'hakan',    'mehmet',   'black wins'),  -- team1=7, team2=9
+  (14, 'julia',    'elena',    'draw'),        -- team1=8, team2=10
+  (15, 'nina',     'xena',     'draw'),        -- team1=1, team2=4
+  (16, 'vera',     'claire',   'white wins'),  -- team1=2, team2=5
+  (17, 'sofia',    'jacob',    'black wins'),  -- team1=3, team2=6
+  (18, 'ava',      'logan',    'black wins'),  -- team1=7, team2=10
+  (19, 'amelia',   'alex',     'black wins'),  -- team1=5, team2=8
+  (20, 'benjamin', 'isabella', 'white wins');  -- team1=6, team2=9
 

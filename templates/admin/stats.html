@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}System Statistics - Chess Tournament Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">System Statistics</h1>
+    <p class="text-muted">Statistics computed by background worker</p>
+
+    {% if not stats %}
+    <div class="alert alert-info">
+        No statistics available yet. The background worker may not have run yet.
+    </div>
+    {% else %}
+
+    <!-- Summary Statistics -->
+    {% if stats.summary and stats.summary.summary %}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Summary Overview</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% set summary = stats.summary.summary.value %}
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_users or 0 }}</h3>
+                            <p class="mb-0">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_players or 0 }}</h3>
+                            <p class="mb-0">Players</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_coaches or 0 }}</h3>
+                            <p class="mb-0">Coaches</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_arbiters or 0 }}</h3>
+                            <p class="mb-0">Arbiters</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_teams or 0 }}</h3>
+                            <p class="mb-0">Teams</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_matches or 0 }}</h3>
+                            <p class="mb-0">Matches</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.total_halls or 0 }}</h3>
+                            <p class="mb-0">Halls</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3>{{ summary.average_player_elo|int or 0 }}</h3>
+                            <p class="mb-0">Avg ELO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Top Players -->
+        {% if stats.players and stats.players.top_players_by_elo %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Top Players by ELO</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>ELO</th>
+                                <th>Country</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in stats.players.top_players_by_elo.value[:5] %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ player.name }}</td>
+                                <td><strong>{{ player.elo }}</strong></td>
+                                <td>{{ player.nationality }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Most Active Players -->
+        {% if stats.players and stats.players.most_active_players %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Most Active Players</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Matches</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in stats.players.most_active_players.value[:5] %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ player.name }}</td>
+                                <td><strong>{{ player.matches }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- Team Statistics -->
+        {% if stats.teams and stats.teams.team_win_rates %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Team Win Rates</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>Wins</th>
+                                <th>Total</th>
+                                <th>Win %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in stats.teams.team_win_rates.value[:5] %}
+                            <tr>
+                                <td>{{ team.team_name }}</td>
+                                <td>{{ team.wins }}</td>
+                                <td>{{ team.total_games }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: {{ team.win_rate }}%">
+                                            {{ team.win_rate }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Hall Utilization -->
+        {% if stats.halls and stats.halls.hall_utilization %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Hall Utilization</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Hall</th>
+                                <th>Country</th>
+                                <th>Capacity</th>
+                                <th>Matches</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hall in stats.halls.hall_utilization.value[:5] %}
+                            <tr>
+                                <td>{{ hall.hall_name }}</td>
+                                <td>{{ hall.country }}</td>
+                                <td>{{ hall.capacity }}</td>
+                                <td><strong>{{ hall.matches_hosted }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- Match Results Distribution -->
+        {% if stats.matches and stats.matches.matches_by_result %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Match Results Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Result</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result, count in stats.matches.matches_by_result.value.items() %}
+                            <tr>
+                                <td>{{ result or 'Pending' }}</td>
+                                <td><strong>{{ count }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Arbiter Ratings -->
+        {% if stats.arbiters and stats.arbiters.arbiter_avg_ratings %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header" style="background-color: #6f42c1; color: white;">
+                    <h5 class="mb-0">Arbiter Performance</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Arbiter</th>
+                                <th>Avg Rating</th>
+                                <th>Matches Rated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for arbiter in stats.arbiters.arbiter_avg_ratings.value %}
+                            <tr>
+                                <td>{{ arbiter.arbiter }}</td>
+                                <td><strong>{{ arbiter.avg_rating }}</strong></td>
+                                <td>{{ arbiter.rated_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Last Updated -->
+    {% if stats.meta and stats.meta.last_computed_at %}
+    <div class="text-muted text-end mt-3">
+        <small>Last updated: {{ stats.meta.last_computed_at.value }}</small>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('manager_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

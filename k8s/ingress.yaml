@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chess-tournament-ingress
+  namespace: chess-tournament
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "chess-tournament-ip"
+    networking.gke.io/managed-certificates: "chess-tournament-cert"
+    # For HTTPS redirect
+    kubernetes.io/ingress.allow-http: "false"
+  labels:
+    app: chess-tournament
+spec:
+  defaultBackend:
+    service:
+      name: chess-tournament-service
+      port:
+        number: 80
+  rules:
+    - http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: chess-tournament-service
+                port:
+                  number: 80
+---
+# Managed Certificate for HTTPS (optional - requires domain)
+# apiVersion: networking.gke.io/v1
+# kind: ManagedCertificate
+# metadata:
+#   name: chess-tournament-cert
+#   namespace: chess-tournament
+# spec:
+#   domains:
+#     - chess-tournament.example.com

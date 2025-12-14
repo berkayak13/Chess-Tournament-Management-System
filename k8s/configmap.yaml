@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chess-tournament-config
+  namespace: chess-tournament
+  labels:
+    app: chess-tournament
+data:
+  # Replace these values with your actual Cloud SQL private IP
+  db_host: "10.x.x.x"
+  db_name: "chessdb"
+  # Replace with your Memorystore Redis URL
+  redis_url: "redis://10.x.x.x:6379/0"
+  # Replace with your Cloud Function URL
+  function_url: "https://chess-tournament-audit-logger-xxxxx.a.run.app"

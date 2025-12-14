@@ -1,0 +1,88 @@
+services:
+  # Flask Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=dev-secret-key-for-docker
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=chessdb
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Mount for development hot-reload (optional)
+      - ./templates:/app/templates:ro
+      - ./static:/app/static:ro
+    networks:
+      - chess-network
+    restart: unless-stopped
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"  # Use 3307 to avoid conflict with local MySQL
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=chessdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Initialize database with schema and triggers
+      - ./code/triggers.sql:/docker-entrypoint-initdb.d/01-triggers.sql:ro
+      - ./code/insert_statements.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - chess-network
+    restart: unless-stopped
+
+  # Redis Cache (for Milestone 7)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - chess-network
+    restart: unless-stopped
+
+  # Adminer - Database management UI (optional, for development)
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8081:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+    depends_on:
+      - db
+    networks:
+      - chess-network
+    profiles:
+      - dev-tools
+
+networks:
+  chess-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:

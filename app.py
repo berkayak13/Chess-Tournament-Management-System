@@ -5,24 +5,53 @@ import os
 from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
+from config import get_config
+from cache import init_cache, CacheHelper, CACHE_TIMEOUTS
+import requests
 
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+# Get configuration based on environment
+app_config = get_config()
 
-# Database configuration
-db_config = {
-    'host': '127.0.0.1',
-    'user': 'root',
-    'password': '1234',
-    'database': 'chessdb'
-}
+app = Flask(__name__)
+app.config['SECRET_KEY'] = app_config.SECRET_KEY
+app.config['TESTING'] = getattr(app_config, 'TESTING', False)
+app.config['WTF_CSRF_ENABLED'] = getattr(app_config, 'WTF_CSRF_ENABLED', True)
+
+# Database configuration from config module
+db_config = app_config.get_db_config()
+
+# Initialize caching
+cache = init_cache(app)
+cache_helper = CacheHelper(cache)
+
+# Cloud Function URL for audit logging
+FUNCTION_URL = app_config.FUNCTION_URL
 
 # Initialize login manager
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+
+def send_audit_log(event_type, username=None, details=None, request_obj=None):
+    """Send audit log to Cloud Function (non-blocking)."""
+    if not FUNCTION_URL:
+        return
+
+    try:
+        payload = {
+            'event_type': event_type,
+            'username': username,
+            'details': details or {},
+            'ip_address': request_obj.remote_addr if request_obj else None,
+            'user_agent': request_obj.headers.get('User-Agent') if request_obj else None
+        }
+        # Use a short timeout to not block the main request
+        requests.post(FUNCTION_URL, json=payload, timeout=1)
+    except Exception as e:
+        app.logger.warning(f"Failed to send audit log: {e}")
 
 def get_db_connection():
     try:
@@ -275,6 +304,8 @@ def login():
                 if user_data:
                     user = User(user_data['username'], user_data['password'], user_data['role'])
                     login_user(user)
+                    # Audit log for successful login
+                    send_audit_log('login', username=username, details={'role': user_data['role']}, request_obj=request)
                     return redirect(url_for('index'))
                 flash('Invalid username or password')
             except Error as e:
@@ -288,6 +319,8 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    # Audit log for logout
+    send_audit_log('logout', username=current_user.id, request_obj=request)
     logout_user()
     return redirect(url_for('index'))
 
@@ -852,8 +885,12 @@ def coach_create_match():
                 
                 conn.commit()
                 flash('Match created successfully')
+                # Audit log for match creation
+                send_audit_log('match_created', username=current_user.id,
+                             details={'match_id': next_match_id, 'team1_id': coach_info['team_id'],
+                                     'team2_id': team2_id, 'date': str(date)}, request_obj=request)
                 return redirect(url_for('coach_dashboard'))
-                
+
             except Error as e:
                 conn.rollback()
                 flash(f'Error creating match: {str(e)}')
@@ -1251,8 +1288,11 @@ def arbiter_rate_match(match_id):
                 
                 conn.commit()
                 flash('Match rated successfully')
+                # Audit log for match rating
+                send_audit_log('match_rated', username=current_user.id,
+                             details={'match_id': match_id, 'rating': rating}, request_obj=request)
                 return redirect(url_for('arbiter_dashboard'))
-                
+
             except Error as e:
                 conn.rollback()
                 print(f"Error rating match: {str(e)}")
@@ -1309,6 +1349,7 @@ def arbiter_statistics():
 
 @app.route('/api/halls/<int:hall_id>/tables')
 @login_required
+@cache_helper.cached(timeout=CACHE_TIMEOUTS['api_tables'], key_prefix='hall_tables')
 def get_hall_tables(hall_id):
     conn = get_db_connection()
     if not conn:
@@ -1333,6 +1374,60 @@ def get_hall_tables(hall_id):
     except Error as e:
         print(f"Error fetching tables: {e}")
         return jsonify({'error': 'Database error'}), 500
+
+
+# Admin Stats Route (displays worker-computed statistics)
+@app.route('/admin/stats')
+@login_required
+def admin_stats():
+    if current_user.role != 'manager':
+        flash('Access denied. Only managers can access this page.')
+        return redirect(url_for('index'))
+
+    conn = get_db_connection()
+    if not conn:
+        flash('Database connection error')
+        return redirect(url_for('manager_dashboard'))
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all system stats computed by the worker
+        cursor.execute("""
+            SELECT stat_name, stat_value, stat_category, computed_at
+            FROM system_stats
+            ORDER BY stat_category, stat_name
+        """)
+        raw_stats = cursor.fetchall()
+
+        # Parse JSON values and organize by category
+        stats = {}
+        for row in raw_stats:
+            category = row['stat_category']
+            if category not in stats:
+                stats[category] = {}
+
+            try:
+                import json
+                value = json.loads(row['stat_value'])
+            except (json.JSONDecodeError, TypeError):
+                value = row['stat_value']
+
+            stats[category][row['stat_name']] = {
+                'value': value,
+                'computed_at': row['computed_at']
+            }
+
+        cursor.close()
+        conn.close()
+
+        return render_template('admin/stats.html', stats=stats)
+
+    except Error as e:
+        print(f"Error fetching admin stats: {str(e)}")
+        flash(f'Error fetching statistics: {str(e)}')
+        return redirect(url_for('manager_dashboard'))
+
 
 if __name__ == '__main__':
     app.run(debug=True) 

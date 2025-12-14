@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chess-tournament-app
+  namespace: chess-tournament
+  labels:
+    app: chess-tournament
+    component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chess-tournament
+      component: web
+  template:
+    metadata:
+      labels:
+        app: chess-tournament
+        component: web
+    spec:
+      serviceAccountName: chess-tournament-app
+      containers:
+        # Flask Application
+        - name: app
+          image: REGION-docker.pkg.dev/PROJECT_ID/chess-tournament/chess-tournament-app:latest
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: FLASK_ENV
+              value: "production"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: chess-tournament-config
+                  key: db_host
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: chess-tournament-config
+                  key: db_name
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: chess-tournament-secrets
+                  key: db_user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chess-tournament-secrets
+                  key: db_password
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: chess-tournament-secrets
+                  key: secret_key
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: chess-tournament-config
+                  key: redis_url
+            - name: FUNCTION_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: chess-tournament-config
+                  key: function_url
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      # Optionally add Cloud SQL Proxy sidecar for public IP Cloud SQL
+      # - name: cloud-sql-proxy
+      #   image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0
+      #   args:
+      #     - "--structured-logs"
+      #     - "--port=3306"
+      #     - "PROJECT_ID:REGION:INSTANCE_NAME"
+      #   resources:
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "50m"

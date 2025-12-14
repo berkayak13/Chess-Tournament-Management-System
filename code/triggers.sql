@@ -1,3 +1,20 @@
+-- ============================================================================
+-- System Stats Table (for VM Worker aggregations)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS system_stats (
+    stat_id INT AUTO_INCREMENT PRIMARY KEY,
+    stat_name VARCHAR(100) NOT NULL,
+    stat_value TEXT NOT NULL,
+    stat_category VARCHAR(50) DEFAULT 'general',
+    computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_stat_name (stat_name),
+    INDEX idx_category (stat_category),
+    INDEX idx_computed_at (computed_at)
+) ENGINE=InnoDB;
+
+-- ============================================================================
+
 DELIMITER $$
 
 -- Trigger: Prevent overlapping coach contracts (no coach on multiple teams during overlapping dates)
@@ -375,6 +392,7 @@ END $$
 
 -- Procedure: deleteMatch(match_id)
 -- Deletes the specified match and any associated assignments or ratings.
+DROP PROCEDURE IF EXISTS deleteMatch $$
 CREATE PROCEDURE deleteMatch(
     IN inMatchID INT
 )
@@ -390,6 +408,7 @@ END$$
 
 -- Procedure: viewHalls()
 -- Returns a list of all halls with their name, country, and capacity.
+DROP PROCEDURE IF EXISTS viewHalls $$
 CREATE PROCEDURE viewHalls()
 BEGIN
     SELECT hall_name AS Hall, hall_country AS Country, hall_capacity AS Total_Tables
@@ -398,6 +417,7 @@ END$$
 
 -- Procedure: viewMatchesByArbiter(arbiter_username)
 -- Lists all matches assigned to the given arbiter, with details (date, time, location, teams, rating).
+DROP PROCEDURE IF EXISTS viewMatchesByArbiter $$
 CREATE PROCEDURE viewMatchesByArbiter(
     IN arbUsername VARCHAR(50)
 )
@@ -421,6 +441,7 @@ END$$
 
 -- Procedure: submitRating(arb_username, match_id, rating_value)
 -- Allows an arbiter to submit a rating for a match after it has occurred (only by assigned arbiter, once).
+DROP PROCEDURE IF EXISTS submitRating $$
 CREATE PROCEDURE submitRating(
     IN arbUsername VARCHAR(50),
     IN inMatchID INT,
@@ -456,6 +477,7 @@ END$$
 
 -- Procedure: showMatchStats(arbiter_username)
 -- Returns the total number of matches rated by the given arbiter and the average rating given.
+DROP PROCEDURE IF EXISTS showMatchStats $$
 CREATE PROCEDURE showMatchStats(
     IN paramArb VARCHAR(50)
 )

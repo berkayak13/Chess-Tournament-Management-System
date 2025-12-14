@@ -1,0 +1,36 @@
+# ============================================================================
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and fill in your values
+# ============================================================================
+
+# Required
+project_id  = "your-gcp-project-id"
+db_password = "your-secure-database-password"
+
+# Optional - Override defaults
+region      = "us-central1"
+zone        = "us-central1-a"
+environment = "dev"
+
+# GKE
+gke_cluster_name = "chess-tournament-cluster"
+gke_node_count   = 2
+gke_machine_type = "e2-small"
+
+# Cloud SQL
+db_instance_name = "chess-tournament-db"
+db_tier          = "db-f1-micro"
+db_name          = "chessdb"
+db_user          = "chess_app"
+
+# Worker VM
+worker_vm_name    = "chess-tournament-worker"
+worker_machine_type = "e2-micro"
+
+# Redis
+redis_name           = "chess-tournament-cache"
+redis_memory_size_gb = 1
+
+# Container
+app_image_name = "chess-tournament-app"
+app_image_tag  = "latest"

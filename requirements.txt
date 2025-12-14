@@ -4,4 +4,21 @@ Flask-Login==0.6.3
 Flask-WTF==1.2.1
 mysql-connector-python==8.3.0
 python-dotenv==1.0.1
-Werkzeug==3.0.1 
+Werkzeug==3.0.1
+
+# Testing
+pytest==8.0.0
+pytest-cov==4.1.0
+
+# Production server
+gunicorn==21.2.0
+
+# HTTP requests (for Cloud Function integration)
+requests==2.31.0
+
+# Caching (for Milestone 7)
+Flask-Caching==2.1.0
+redis==5.0.1
+
+# Load testing (for Milestone 9)
+locust>=2.15.0 
