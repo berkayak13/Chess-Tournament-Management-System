@@ -164,9 +164,9 @@ jobs:
 
       - name: Update deployment image
         run: |
-          # Update the image in deployment
+          # Update the image in deployment (container name is 'app')
           kubectl set image deployment/chess-tournament-app \
-            chess-tournament-app=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            app=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             -n chess-tournament
 
       - name: Wait for rollout
@@ -212,7 +212,7 @@ jobs:
             --region ${{ env.REGION }} \
             --source . \
             --entry-point audit_log \
-            --set-env-vars AUDIT_BUCKET=${{ secrets.AUDIT_BUCKET }},DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=chessdb \
+            --update-env-vars AUDIT_BUCKET=${{ secrets.AUDIT_BUCKET }} \
             --memory 256MB \
             --timeout 60s
 
