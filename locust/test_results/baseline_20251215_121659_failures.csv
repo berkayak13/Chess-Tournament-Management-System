@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences
+GET,/coach/create_match,HTTPError('404 Client Error: NOT FOUND for url: /coach/create_match'),8

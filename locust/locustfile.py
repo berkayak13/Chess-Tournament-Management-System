@@ -10,14 +10,129 @@ Test scenarios:
 - Arbiter operations (rating matches)
 - Manager operations (user management, stats)
 - API endpoint testing
+
+Performance Metrics Collected:
+- Request latency (p50, p95, p99)
+- Throughput (requests/second)
+- Error rates
+- Response time distribution
 """
 
-from locust import HttpUser, task, between, tag
+from locust import HttpUser, task, between, tag, events
+from locust.runners import MasterRunner, LocalRunner
 import random
 import logging
+import time
+import json
+import os
+from datetime import datetime
 
 # Suppress some logging noise
 logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+# Performance metrics storage
+performance_metrics = {
+    'start_time': None,
+    'end_time': None,
+    'total_requests': 0,
+    'total_failures': 0,
+    'response_times': [],
+    'requests_per_second': [],
+    'errors_by_type': {},
+    'endpoint_metrics': {}
+}
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    """Initialize metrics collection when test starts."""
+    performance_metrics['start_time'] = datetime.now()
+    logging.info(f"Performance test started at {performance_metrics['start_time']}")
+
+
+@events.test_stop.add_listener
+def on_test_stop(environment, **kwargs):
+    """Save metrics when test stops."""
+    performance_metrics['end_time'] = datetime.now()
+
+    # Calculate summary statistics
+    stats = environment.stats
+
+    # Save detailed metrics to file
+    results_dir = 'test_results'
+    os.makedirs(results_dir, exist_ok=True)
+
+    timestamp = performance_metrics['start_time'].strftime('%Y%m%d_%H%M%S')
+    results_file = f"{results_dir}/performance_results_{timestamp}.json"
+
+    summary = {
+        'test_info': {
+            'start_time': performance_metrics['start_time'].isoformat(),
+            'end_time': performance_metrics['end_time'].isoformat(),
+            'duration_seconds': (performance_metrics['end_time'] - performance_metrics['start_time']).total_seconds(),
+            'host': environment.host
+        },
+        'overall_stats': {
+            'total_requests': stats.total.num_requests,
+            'total_failures': stats.total.num_failures,
+            'failure_rate': stats.total.fail_ratio,
+            'average_response_time': stats.total.avg_response_time,
+            'min_response_time': stats.total.min_response_time,
+            'max_response_time': stats.total.max_response_time,
+            'median_response_time': stats.total.median_response_time,
+            'avg_content_length': stats.total.avg_content_length,
+            'requests_per_second': stats.total.total_rps,
+            'total_rps': stats.total.current_rps
+        },
+        'percentiles': {
+            'p50': stats.total.get_response_time_percentile(0.5),
+            'p75': stats.total.get_response_time_percentile(0.75),
+            'p90': stats.total.get_response_time_percentile(0.90),
+            'p95': stats.total.get_response_time_percentile(0.95),
+            'p99': stats.total.get_response_time_percentile(0.99)
+        },
+        'endpoint_details': {}
+    }
+
+    # Per-endpoint statistics
+    for name, endpoint_stats in stats.entries.items():
+        summary['endpoint_details'][name] = {
+            'num_requests': endpoint_stats.num_requests,
+            'num_failures': endpoint_stats.num_failures,
+            'avg_response_time': endpoint_stats.avg_response_time,
+            'min_response_time': endpoint_stats.min_response_time,
+            'max_response_time': endpoint_stats.max_response_time,
+            'median_response_time': endpoint_stats.median_response_time,
+            'requests_per_second': endpoint_stats.total_rps,
+            'failure_rate': endpoint_stats.fail_ratio,
+            'percentiles': {
+                'p50': endpoint_stats.get_response_time_percentile(0.5),
+                'p95': endpoint_stats.get_response_time_percentile(0.95),
+                'p99': endpoint_stats.get_response_time_percentile(0.99)
+            }
+        }
+
+    # Save to file
+    with open(results_file, 'w') as f:
+        json.dump(summary, f, indent=2)
+
+    logging.info(f"Performance metrics saved to {results_file}")
+
+    # Print summary to console
+    print("\n" + "="*80)
+    print("PERFORMANCE TEST SUMMARY")
+    print("="*80)
+    print(f"Duration: {summary['test_info']['duration_seconds']:.2f} seconds")
+    print(f"Total Requests: {summary['overall_stats']['total_requests']}")
+    print(f"Total Failures: {summary['overall_stats']['total_failures']}")
+    print(f"Failure Rate: {summary['overall_stats']['failure_rate']*100:.2f}%")
+    print(f"Requests/Second: {summary['overall_stats']['requests_per_second']:.2f}")
+    print(f"\nResponse Times:")
+    print(f"  Average: {summary['overall_stats']['average_response_time']:.2f} ms")
+    print(f"  Median (p50): {summary['percentiles']['p50']:.2f} ms")
+    print(f"  p95: {summary['percentiles']['p95']:.2f} ms")
+    print(f"  p99: {summary['percentiles']['p99']:.2f} ms")
+    print("="*80 + "\n")
 
 
 class ChessUser(HttpUser):

@@ -1,0 +1,27 @@
+{
+  "test_info": {
+    "start_time": "2025-12-15T12:44:04.669350",
+    "end_time": "2025-12-15T12:51:04.704895",
+    "duration_seconds": 420.035545,
+    "host": "http://localhost:8080"
+  },
+  "overall_stats": {
+    "total_requests": 20259,
+    "total_failures": 560,
+    "failure_rate": 0.027642035638481662,
+    "average_response_time": 10.862724398790613,
+    "min_response_time": 0.8305420051328838,
+    "max_response_time": 252.6795409503393,
+    "median_response_time": 5,
+    "avg_content_length": 2319.166000296165,
+    "requests_per_second": 48.23163424565471,
+    "total_rps": 70.2
+  },
+  "percentiles": {
+    "p50": 5,
+    "p75": 8,
+    "p90": 11,
+    "p95": 27,
+    "p99": 150.0
+  },
+  "endpoint_details": {
